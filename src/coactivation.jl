@@ -2,6 +2,8 @@ using MultivariateStats
 using JLD
 
 export ICAEnsemble, detectICAensembles, trackdetectensemble
+export pca_npatterns, pca_patterns_per_binsize
+export loadcache, checkcache
 
 #abstract type Assembly end
 

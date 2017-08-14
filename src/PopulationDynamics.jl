@@ -1,8 +1,9 @@
 module PopulationDynamics
+using Reexport
+@reexport using EPhys
+using MultivariateStats, StatsBase
 
-using EPhys
-using MultivariateStats
-
+include("types.jl")
 include("coactivation.jl")
 include("coactivation_surrogates.jl")
 #include("crosscor.jl")

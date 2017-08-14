@@ -1,3 +1,4 @@
+export trackdetectensemble_surrogates, detectICAensembles_surrogate
 
 function detectICAensembles_surrogate(binnedspikematrix, binsize, npatterns)
     nbins = size(binnedspikematrix,1)
@@ -7,34 +8,45 @@ function detectICAensembles_surrogate(binnedspikematrix, binsize, npatterns)
     return surV
 end
 
-function trackdetectensemble_surrogates(metadata, sessions, use_cache=true;
-    only_cache=false, nsurrogates = 5000)
+function trackdetectensemble_surrogates(m,s,b::Bool; kwargs...)
+    throw(ArgumentError, "use_cache is now a keyword argument")
+end
+
+function trackdetectensemble_surrogates(metadata, sessions;
+                                        use_cache=true, only_cache=false, nsurrogates = 5000)
     if use_cache && EPhys.checkcache(metadata,sessions)
         ensemble, surrogates = loadcache_surrogates(metadata,sessions)
         return ensemble, surrogates
     elseif only_cache
         error("Cached results not found")
     end
-    # Bin Matrix
+    # Set up Binned Spike Matrix
     cells2use = [false; metadata["cellIDs"].!="lick"]
     binsize = 0.02 #secs
-    spiketimes = loadspikes(SpikeTimes, metadata, sessions)
-    spikematrix = loadspikes(SpikeMatrix, metadata, sessions)
+    spiketimes = loadspikes(EPhys.SpikeTimes, metadata, sessions)
+    spikematrix = loadspikes(EPhys.SpikeMatrix, metadata, sessions)
     spiketimes = getindex.(spiketimes,find(cells2use))
     binsamples = binsize*spiketimes[1].fs
     binnedspiketimes = fit.([Histogram], times.(spiketimes),
         [0:binsamples:spiketimes[1].maxtime], closed=:right)
     binnedspikematrix = cat(2,getfield.(binnedspiketimes,[:weights])...);
 
+    # Fit Model
     Z, outPCA, npatterns, outICA, V = 
         EPhys.detectICAensembles(binnedspikematrix, binsize)
+    
+    # Fit Model to surrogates (bootstrap)
     surrogateVs = pmap(x->detectICAensembles_surrogate(binnedspikematrix,
             binsize, npatterns), 1:nsurrogates);
-    reorder!.(surrogateVs,[V])
+    reorder!.(surrogateVs,[V]) # reorder by correlation
+
+    # Track original model
     Zconv, R, activationtimes = EPhys.trackensemble(spikematrix, V, binsize, cells2use)
+    
+    # Create Assembly Object
     ensemble = ICAEnsemble(Z, npatterns, outPCA, outICA, V, Zconv, R, activationtimes)
 
-    try
+    try # cache
         cacheensemble_surrogates(metadata, sessions, ensemble, surrogateVs)
     catch
         warn("Cache Failed.")
