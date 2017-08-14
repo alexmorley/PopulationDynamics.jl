@@ -1,5 +1,10 @@
 module PopulationDynamics
 
-# package code goes here
+using EPhys
+using MultivariateStats
 
-end # module
+include("coactivation.jl")
+include("coactivation_surrogates.jl")
+include("crosscor.jl")
+
+end 
