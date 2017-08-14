@@ -5,6 +5,6 @@ using MultivariateStats
 
 include("coactivation.jl")
 include("coactivation_surrogates.jl")
-include("crosscor.jl")
+#include("crosscor.jl")
 
 end 
