@@ -1,5 +1,7 @@
 abstract type PopulationModel end
 
+track{T}(model::PopulationModel, Z::Array{T,2}) = track(weights(model), Z)
+
 # all subtypes of PopulationModel must have at least two methods
 # PopulationModel(opts...)  # a constructor
 # fit(p::Type{PopulationModel}, Z::Array{T,N), opts) # fit the model to an input

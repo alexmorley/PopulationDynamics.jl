@@ -3,7 +3,7 @@ using Reexport
 @reexport using EPhys
 using MultivariateStats, StatsBase
 
-export fit!, weights
+export fit!, weights, track
 
 include("types.jl")
 include("utils.jl")
