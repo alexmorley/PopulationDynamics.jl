@@ -12,3 +12,5 @@ abstract type PopulationModel end
 
 
 # ^ these methods should also work with the basic dimensionality reduction techniques in MultivariateStats
+
+# Where Z is a 3rd or higher order tensor track & bootstrap will have to take a dimension 
