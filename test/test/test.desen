@@ -1,0 +1,6 @@
+s b 0
+suc panel0
+s b sucpanel0
+sq flicker0
+sq flicker1
+sb sqflicker1

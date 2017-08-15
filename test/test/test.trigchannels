@@ -1,0 +1,10 @@
+tracking DIN00 48
+light DIN01 49
+toneSucrose DIN02 50
+solenoidSucrose DIN03 51
+toneQuinine DIN04 52
+solenoidQuinine DIN05 53
+dropRemoval DIN06 54
+licking DIN07 55
+LEDpanel DIN08 56
+LEDstrip DIN09 57
