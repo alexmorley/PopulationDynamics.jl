@@ -3,3 +3,4 @@ EPhys
 StatsBase
 MultivariateStats
 Reexport
+TensorDecompositions

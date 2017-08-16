@@ -15,8 +15,12 @@ Z = binZ(spiketimes)'
 ### Test ###
 
 println("Testing Models...")
-modelnames = ["PCAICA", "PCA"]
-models = [PCAICA(), PCA()]
+modelnames = ["Canonical Polyadic Decomposition (CPD)",
+              "PCA",
+              "PCAICA"]
+models = [CP(2),
+          PCAICA(),
+          PCA()]
 for (model,name) in zip(models, modelnames)
     println("   $name")
     println("       fit")
@@ -27,4 +31,3 @@ for (model,name) in zip(models, modelnames)
     println("       bootstrap")
     @test typeof(bootstrap(model, Z, 3)) == Array{typeof(model),1}
 end
-
