@@ -43,3 +43,44 @@ end
 Get threshold for eigenvalue distribution using Marchenko-Pasur Law. See wiki: https://en.wikipedia.org/wiki/Marchenko%E2%80%93Pastur_distribution
 """
 marchenko_thresh(n,B) = ((1-sqrt(n/B))^2,(1+sqrt(n/B))^2)
+
+
+"""
+    bootstrap(model::PopulationModel, Z, n=100, dim=2)
+Fit model `n` times sampling (with replacement) from dimension `dim`.
+"""
+function bootstrap{T,N}(model::PopulationModel, Z::Array{T,N}, n=100, dim=2)
+    nsamples = size(Z,dim)
+    sample_inds = zeros(Int,nsamples)
+    models = [deepcopy(model) for _ in 1:n]
+    for i in 1:n
+        sample_inds .= sample(1:nsamples, nsamples, replace=true)
+        fit!(models[i], Z[to_indices(Z,Tuple(x != dim ? Colon() : sample_inds for x in 1:N))...])
+    end
+    return models
+end
+
+"""
+    function confint{T<:PopulationModel}(f::Function,
+                                    models::Array{T,1};
+                                    α=0.05)
+Get confidence interval of parameter from sample of `models` where the
+parameter is defined by `f(model)` 
+"""
+function confint{T<:PopulationModel}(f::Function,
+                                    models::Array{T,1};
+                                    α=0.05)
+    params = f.(models)
+    lo = zeros(size(params[1])...)
+    hi = copy(lo)
+    α2 = α/2
+    for i in eachindex(params[1])
+        y = cat(1,[x[i] for x in params])
+        lo[i] = StatsBase.percentile(y, α2)
+        hi[i] = StatsBase.percentile(y, 100-α2)
+    end
+    return lo,hi
+end
+function confint{T<:PopulationModel}(models::Array{T,1};args...)
+    confint(weights,models)
+end

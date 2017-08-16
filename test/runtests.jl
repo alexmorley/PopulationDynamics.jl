@@ -24,5 +24,7 @@ for (model,name) in zip(models, modelnames)
     @test typeof(weights(model)) == Array{Float64,2}
     println("       track")
     @test track(model, zeros(size(Z,1),100)) == zeros(model.k,100)
+    println("       bootstrap")
+    @test typeof(bootstrap(model, Z, 3)) == Array{typeof(model),1}
 end
 

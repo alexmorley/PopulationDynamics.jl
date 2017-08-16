@@ -1,3 +1,5 @@
+export PopulationModel
+
 abstract type PopulationModel end
 
 track{T}(model::PopulationModel, Z::Array{T,2}) = track(weights(model), Z)
