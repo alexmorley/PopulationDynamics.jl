@@ -1,5 +1,5 @@
 # PopulationDynamics
-https://travis-ci.com/alexmorley/PopulationDynamics.jl.svg?token=J1NxBfxGFhAmxxjYjuHi&branch=master
+![TravisCI](https://travis-ci.com/alexmorley/PopulationDynamics.jl.svg?token=J1NxBfxGFhAmxxjYjuHi&branch=master)
 
 ## To Do
 - [ ] Define fit for each method
