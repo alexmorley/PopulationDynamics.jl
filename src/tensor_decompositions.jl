@@ -9,8 +9,8 @@ mutable struct CP <: PopulationModel
 end
 
 function fit!(model::CP, Z::Array{Float64,3})
-	model.cp = candecomp(Z, model.k, ([randn(x,r) for x in size(Z)]...),
-    compute_error=true, method=:ALS)
+    model.cp = candecomp(Z, model.k, ([randn(x,model.k) for x in size(Z)]...),
+    compute_error=true, method=:ALS, verbose=false, maxiter=1000)
 end
 
 weights(model::CP) = model.cp.factors[1]

@@ -4,3 +4,4 @@ StatsBase
 MultivariateStats
 Reexport
 TensorDecompositions
+Munkres

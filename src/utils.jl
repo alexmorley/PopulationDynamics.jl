@@ -1,5 +1,16 @@
 """
-	function normweightvectors!(V)
+    reorder!(X,V)
+Reorder Array `X` according to its correlation with `V`. Uses Hungarian
+Algo to maximise diagonal of correlation matrix.
+"""
+function reorder!(X::Array{T,2},V::Array{T,2}) where T
+    cormat = cor(V, X)
+    sur_perm = munkres(-cormat)
+    X .= X[:,sur_perm]
+end
+
+"""
+    function normweightvectors!(V)
 Normalise the weight vector of each pattern so that the maximum absolute value
 is one.
 """
@@ -17,7 +28,7 @@ end
     function track(Z, V)
 Track zscored firing rates Z using weight vectors V.
 Tracking uses quadratic form
-    R(t) = z(t)' * Pk(t) * (zt)
+R(t) = z(t)' * Pk(t) * (zt)
 """
 function track{T<:Float64}(Z::Array{T,2}, V::Array{T,2})
     K = size(V,2)
@@ -52,25 +63,29 @@ Fit model `n` times sampling (with replacement) from dimension `dim`.
 function bootstrap{T,N}(model::PopulationModel, Z::Array{T,N}, n=100, dim=2)
     nsamples = size(Z,dim)
     sample_inds = zeros(Int,nsamples)
-    models = [deepcopy(model) for _ in 1:n]
-    for i in 1:n
+    f(_) = begin
+        m_i = deepcopy(model)
         sample_inds .= sample(1:nsamples, nsamples, replace=true)
-        fit!(models[i], Z[to_indices(Z,Tuple(x != dim ? Colon() : sample_inds for x in 1:N))...])
+        fit!(m_i, Z[to_indices(Z,Tuple(x != dim ? Colon() : sample_inds for x in 1:N))...])
+        return m_i
     end
-    return models
+    return pmap(f,1:n)
 end
 
 """
     function confint{T<:PopulationModel}(f::Function,
-                                    models::Array{T,1};
-                                    α=0.05)
+                                         model::T,
+                                         models::Array{T,1};
+                                         α=0.05)
 Get confidence interval of parameter from sample of `models` where the
 parameter is defined by `f(model)` 
 """
 function confint{T<:PopulationModel}(f::Function,
-                                    models::Array{T,1};
-                                    α=0.05)
+                                     model::T,
+                                     models::Array{T,1};
+                                     α=0.05)
     params = f.(models)
+    reorder!.(params, [f(model)])
     lo = zeros(size(params[1])...)
     hi = copy(lo)
     α2 = α/2
@@ -81,6 +96,7 @@ function confint{T<:PopulationModel}(f::Function,
     end
     return lo,hi
 end
-function confint{T<:PopulationModel}(models::Array{T,1};args...)
+
+function confint{T<:PopulationModel}(model::T, models::Array{T,1};args...)
     confint(weights,models)
 end

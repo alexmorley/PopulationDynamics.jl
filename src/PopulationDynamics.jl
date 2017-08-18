@@ -2,9 +2,10 @@ module PopulationDynamics
 using Reexport
 @reexport using EPhys
 using MultivariateStats, StatsBase
-using TensorDecompositions
+using TensorDecompositions, Munkres
 
 export fit!, weights, track, bootstrap, confint
+export factors
 
 include("types.jl")
 include("utils.jl")
