@@ -2,7 +2,7 @@ export CP
 
 mutable struct CP <: PopulationModel
     k::Int
-    cp::Union{CANDECOMP{Float64,3},NaN}
+    cp::Union{CANDECOMP{Float64,3},Float64}
 	function CP(k, cp=NaN)
 		new(k,cp)
 	end
