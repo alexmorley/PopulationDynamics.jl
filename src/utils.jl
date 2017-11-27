@@ -88,7 +88,7 @@ function confint{T<:PopulationModel}(f::Function,
     reorder!.(params, [f(model)])
     lo = zeros(size(params[1])...)
     hi = copy(lo)
-    α2 = α/2
+    α2 = (α/2)*100
     for i in eachindex(params[1])
         y = cat(1,[x[i] for x in params])
         lo[i] = StatsBase.percentile(y, α2)
@@ -97,6 +97,6 @@ function confint{T<:PopulationModel}(f::Function,
     return lo,hi
 end
 
-function confint{T<:PopulationModel}(model::T, models::Array{T,1};args...)
-    confint(weights,models)
+function confint{T<:PopulationModel}(model::T, models::Array{T,1}; kwargs...)
+    confint(weights, model, models; kwargs)
 end

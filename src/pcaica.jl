@@ -50,7 +50,7 @@ function fit!{T<:Float64}(model::PCAICA, Z::Array{T,2})
 	model.k = model.k == 0 ? sum(model.pca.prinvars.>λmax) : model.k
 	Psign = projection(model.pca)[:,1:model.k] # projection of first k pc's
 	Zproj = At_mul_B(Psign, Z) # project spikes onto pc subspace
-	model.ica = fit(MultivariateStats.ICA, Zproj, model.k, maxiter=1000)
+	model.ica = fit(MultivariateStats.ICA, Zproj, model.k, maxiter=1000, tol=1.0e-5)
 end
 
 function weights(model::PCAICA)
