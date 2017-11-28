@@ -50,6 +50,28 @@ function trackK!(Rk,Pk,Z)
 end
 
 """
+     track_partial(Z::Array{Float64,2}, V::Array{Float64,2}, masks)
+As `track` but with mask on the outer produce of `V` (`Pk`). Useful for assessing contribution of specific sets of neurons,
+or specific interaction between sets of neurons.
+"""
+function track_partial(Z::Array{Float64,2},
+        V::Array{Float64,2}, masks)
+    npatterns = size(V, 2)
+    R = zeros(size(Z,1), npatterns, length(masks))
+    Pk = zeros(size(V,1), size(V,1))
+    Z = Z'
+    for k in 1:npatterns
+        for (mi,m) in enumerate(masks)
+            Pk .= V[:,k]*V[:,k]'
+            Pk[diagind(Pk)] .= 0.;
+            Pk .*= m
+            trackK!(view(R,:,k, mi), Pk, Z)
+        end
+    end
+    return R
+end
+
+"""
     marchenko_thresh(n,B)
 Get threshold for eigenvalue distribution using Marchenko-Pasur Law. See wiki: https://en.wikipedia.org/wiki/Marchenko%E2%80%93Pastur_distribution
 """

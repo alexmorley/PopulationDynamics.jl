@@ -4,7 +4,8 @@ using Reexport
 using MultivariateStats, StatsBase
 using TensorDecompositions, Munkres
 
-export fit!, weights, track, bootstrap, confint
+export fit!, weights
+export track, track_partial, bootstrap, confint
 export factors
 
 include("types.jl")

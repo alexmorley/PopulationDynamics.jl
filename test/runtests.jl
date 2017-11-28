@@ -1,5 +1,5 @@
-using PopulationDynamics
-using Base.Test
+@everywhere using PopulationDynamics
+@everywhere using Base.Test
 
 ### Load ### 
 
