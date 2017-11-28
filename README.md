@@ -1,17 +1,18 @@
 # PopulationDynamics
+![TravisCI](https://travis-ci.com/alexmorley/PopulationDynamics.jl.svg?token=J1NxBfxGFhAmxxjYjuHi&branch=master)
 
 ## To Do
 - [ ] Define fit for each method
     - [X] PCAICA
     - [X] PCA
     - [ ] Factor Analysis
-    - [ ] Tensor Decompositions (CP)
+    - [X] Tensor Decompositions (CP)
     - [ ] Cross Correlations
     - [ ] Community Detection
 - [ ] Define generalised track
     - [X] For "linear stationary" models
-- [ ] Bootstrap for each method
-    - [ ] For 2nd order tensors
-    - [ ] For 3rd order tensors
-- [ ] Document global variable `tempfiledir` for caching results
+- [X] Bootstrap for each method
+    - [X] For 2nd order tensors
+    - [X] For 3rd order tensors
+- [ ] Use/Document global variable `tempfiledir` for caching results
 - [ ] Split EPhys into EPhys Base & spikes/plotrecipes etc.
