@@ -122,3 +122,20 @@ end
 function confint{T<:PopulationModel}(model::T, models::Array{T,1}; kwargs...)
     confint(weights, model, models; kwargs)
 end
+
+
+stability(f::Function, model, models) = mean(similarity(f, model, models),2 )
+
+"""
+	similarity(f::Function=weights, model, models)
+Compare a model to other models using the function `f` (defaults to weights).
+"""
+function similarity(f::Function, model, models)
+    params = f.(models)
+    orig = f(model)
+    PopulationDynamics.reorder!.(params, [orig])
+    cors = VectorOfArray(diag.(cor.([orig], params)))
+    return cors
+end
+
+similarity(model,models) = similarity(weights, model, models)
