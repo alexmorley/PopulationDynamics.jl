@@ -15,6 +15,7 @@ include("utils.jl")
 include("pcaica.jl")
 include("tensor_decompositions.jl")
 
+include("ephysIO.jl")
 #include("coactivation.jl")
 #include("coactivation_surrogates.jl")
 #include("crosscor.jl")
