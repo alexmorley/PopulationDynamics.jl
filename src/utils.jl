@@ -58,11 +58,10 @@ function track_partial(Z::Array{Float64,2},
         V::Array{Float64,2}, masks)
     npatterns = size(V, 2)
     R = zeros(size(Z,1), npatterns, length(masks))
-    Pk = zeros(size(V,1), size(V,1))
     Z = Z'
     Threads.@threads for k in 1:npatterns
         for (mi,m) in enumerate(masks)
-            Pk .= V[:,k]*V[:,k]'
+            Pk = V[:,k]*V[:,k]'
             Pk[diagind(Pk)] .= 0.;
             Pk .*= m
             trackK!(view(R,:,k, mi), Pk, Z)
