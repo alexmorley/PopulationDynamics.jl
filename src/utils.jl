@@ -22,6 +22,7 @@ function normweightvectors!{T}(V::Array{T,2})
         end
         weightvec ./= vecnorm(weightvec)
     end
+    V .= V[:,sortperm(abs.(vec(sum(V,1))))]
 end
 
 """

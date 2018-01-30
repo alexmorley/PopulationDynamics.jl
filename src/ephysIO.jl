@@ -1,3 +1,5 @@
+using Images
+
 export fit_spike_shift
 
 ## these functions rely on the Ephys IO format for metadata & loading in spike times.
