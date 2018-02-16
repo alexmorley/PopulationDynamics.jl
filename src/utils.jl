@@ -17,7 +17,8 @@ is one.
 function normweightvectors!{T}(V::Array{T,2})
     for i in 1:size(V,2)
         weightvec = view(V,:,i)
-        if abs(minimum(weightvec)) > maximum(weightvec)
+        # flip if two of three largest absolute weights are negative
+        if mean(sign.(weightvec[findnmax(abs.(weightvec),3)])) < 0
             weightvec .= -weightvec
         end
         weightvec ./= vecnorm(weightvec)

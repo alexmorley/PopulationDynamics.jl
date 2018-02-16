@@ -39,8 +39,9 @@ mutable struct PCAICA <: PopulationModel
 	k::Int
 	pca::MultivariateStats.PCA
 	ica::MultivariateStats.ICA
-	function PCAICA(k=0::Int, pca=pca(), ica=ica())
-		new(k,pca,ica)
+    seed::AbstractRNG
+    function PCAICA(k=0::Int, pca=pca(), ica=ica(), seed=srand(13))
+		new(k, pca, ica, seed)
 	end
 end
 
@@ -50,7 +51,9 @@ function fit!{T<:Float64}(model::PCAICA, Z::Array{T,2})
 	model.k = model.k == 0 ? sum(model.pca.prinvars.>λmax) : model.k
 	Psign = projection(model.pca)[:,1:model.k] # projection of first k pc's
 	Zproj = At_mul_B(Psign, Z) # project spikes onto pc subspace
-	model.ica = fit(MultivariateStats.ICA, Zproj, model.k, maxiter=10000, tol=1.0e-6)
+	model.ica = fit(MultivariateStats.ICA, Zproj, model.k,
+                    winit=rand(model.seed, size(Zproj,1), model.k), # for reproducibility
+                    maxiter=10000, tol=1.0e-6)
 end
 
 function weights(model::PCAICA)
