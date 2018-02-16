@@ -28,8 +28,8 @@ end
 """
     function track(Z, V)
 Track zscored firing rates Z using weight vectors V.
-Tracking uses quadratic form
-R(t) = z(t)' * Pk(t) * (zt)
+Tracking uses quadratic form:
+    R(t) = z(t)' * Pk(t) * (zt)
 """
 function track{T<:Float64}(Z::Array{T,2}, V::Array{T,2})
     K = size(V,2)
