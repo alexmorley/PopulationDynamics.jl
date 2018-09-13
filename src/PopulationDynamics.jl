@@ -1,9 +1,10 @@
 module PopulationDynamics
 using Reexport
+using utils
 @reexport using EPhys
 using MultivariateStats, StatsBase
-using RecursiveArrayTools
-using TensorDecompositions, Munkres
+using RecursiveArrayTools, TensorDecompositions, Munkres
+
 
 export fit!, weights
 export track, track_partial, bootstrap, confint

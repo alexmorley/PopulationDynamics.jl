@@ -23,6 +23,7 @@ function fit!{T<:Float64}(model::PCA, Z::Array{T,2}; use_marchenko=false)
 	else
 		model.k = length(model.pca.prinvars)
 	end
+    return model
 end
 
 function weights(model::PCA)

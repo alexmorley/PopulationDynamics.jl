@@ -51,9 +51,22 @@ function trackK!(Rk,Pk,Z)
     nothing
 end
 
+function strength{T<:Float64}(Z::Array{T,2}, V::Array{T,2})
+    K = size(V,2)
+    R = zeros(Float64, K)
+    Threads.@threads for k in 1:K
+        Pk = V[:,k]*V[:,k]'
+        Pk[diagind(Pk)] .= 0.
+        for t in 1:size(Z,2)
+            R[k] += Z[:,t]'*Pk*Z[:,t]
+        end
+    end
+    return R
+end
+
 """
      track_partial(Z::Array{Float64,2}, V::Array{Float64,2}, masks)
-As `track` but with mask on the outer produce of `V` (`Pk`). Useful for assessing contribution of specific sets of neurons,
+As `track` but with mask on the outer product of `V` (`Pk`). Useful for assessing contribution of specific sets of neurons,
 or specific interaction between sets of neurons.
 """
 function track_partial(Z::Array{Float64,2},
@@ -121,9 +134,8 @@ function confint{T<:PopulationModel}(f::Function,
 end
 
 function confint{T<:PopulationModel}(model::T, models::Array{T,1}; kwargs...)
-    confint(weights, model, models; kwargs)
+    confint(weights, model, models; kwargs...)
 end
-
 
 stability(f::Function, model, models) = mean(similarity(f, model, models),2 )
 
@@ -140,3 +152,22 @@ function similarity(f::Function, model, models)
 end
 
 similarity(model,models) = similarity(weights, model, models)
+
+"""
+	get_sig_membs(model::P, btstrp::Array{P,1}, sigf = (lo,hi) -> (lo .> 0);
+		α=0.05)
+Find the members of the model that consistently contribute to the model under
+subsampling (usually bootstrap).
+"""
+function get_sig_membs(model::P, btstrp::Array{P,1}, sigf = (lo,hi) -> (lo .> 0);
+        α=0.05) where P<:PopulationModel
+    V = weights(model)
+    lo,hi=confint(weights, model, btstrp, α=α)
+    sign_membs = falses(size(V,2))
+    for i in indices(V,2)
+        sign_membs[i] = sigf(lo[:,i],hi[:,i])
+    end
+    sign_membs
+end
+
+

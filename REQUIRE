@@ -3,6 +3,8 @@ EPhys
 StatsBase
 MultivariateStats
 Reexport
+RecursiveArrayTools
 TensorDecompositions
 Munkres
 utils
+Images
