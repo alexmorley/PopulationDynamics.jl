@@ -2,6 +2,13 @@ module PopulationDynamics
 using Reexport
 using utils
 @reexport using EPhys
+
+if VERSION >= v"0.7.0"
+    using Random
+    using Statistics
+    using LinearAlgebra
+end
+
 using MultivariateStats, StatsBase
 using RecursiveArrayTools, TensorDecompositions, Munkres
 

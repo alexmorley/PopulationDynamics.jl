@@ -2,7 +2,9 @@ export PopulationModel
 
 abstract type PopulationModel end
 
-track{T}(model::PopulationModel, Z::Array{T,2}) = track(weights(model), Z)
+function track(model::PopulationModel, Z::Array{T,2}) where T
+    track(weights(model), Z)
+end
 
 # all subtypes of PopulationModel must have at least two methods
 # PopulationModel(opts...)  # a constructor

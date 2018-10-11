@@ -68,7 +68,7 @@ function track_model(model_t, metadata::Dict, spiketimes::SpikeTimes;
             - diagvsoff
         """)
     end
-    warn("This now returns both the model, the tracked trace, and the binned spike times")
+    #@warn "This now returns both the model, the tracked trace, and the binned spike times"
     return model, R_split, Z
 end
 

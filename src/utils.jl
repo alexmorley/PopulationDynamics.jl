@@ -1,38 +1,38 @@
 """
-    reorder!(X,V)
+reorder!(X,V)
 Reorder Array `X` according to its correlation with `V`. Uses Hungarian
 Algo to maximise diagonal of correlation matrix.
 """
-function reorder!(X::Array{T,2},V::Array{T,2}) where T
+function reorder!(X::AbstractArray{T,2},V::AbstractArray{T,2}) where T
     cormat = cor(V, X)
     sur_perm = munkres(-cormat)
     X .= X[:,sur_perm]
 end
 
 """
-    function normweightvectors!(V)
+function normweightvectors!(V)
 Normalise the weight vector of each pattern so that the maximum absolute value
 is one.
 """
-function normweightvectors!{T}(V::Array{T,2})
+function normweightvectors!(V::AbstractArray{T,2}) where T
     for i in 1:size(V,2)
         weightvec = view(V,:,i)
         # flip if two of three largest absolute weights are negative
         if mean(sign.(weightvec[findnmax(abs.(weightvec),3)])) < 0
             weightvec .= -weightvec
         end
-        weightvec ./= vecnorm(weightvec)
+        weightvec ./= norm(weightvec)
     end
-    V .= V[:,sortperm(abs.(vec(sum(V,1))))]
+    V .= V[:,sortperm(abs.(vec(sum(V,dims=1))))]
 end
 
 """
-    function track(Z, V)
+function track(Z, V)
 Track zscored firing rates Z using weight vectors V.
 Tracking uses quadratic form:
-    R(t) = z(t)' * Pk(t) * (zt)
+R(t) = z(t)' * Pk(t) * (zt)
 """
-function track{T<:Float64}(Z::Array{T,2}, V::Array{T,2})
+function track(Z::AbstractArray{T,2}, V::AbstractArray{T,2}) where T<:Float64
     K = size(V,2)
     R = zeros(Float64, size(Z,2), K)
     Threads.@threads for k in 1:K
@@ -51,7 +51,7 @@ function trackK!(Rk,Pk,Z)
     nothing
 end
 
-function strength{T<:Float64}(Z::Array{T,2}, V::Array{T,2})
+function strength(Z::AbstractArray{T,2}, V::AbstractArray{T,2}) where T<:Float64 
     K = size(V,2)
     R = zeros(Float64, K)
     Threads.@threads for k in 1:K
@@ -65,12 +65,11 @@ function strength{T<:Float64}(Z::Array{T,2}, V::Array{T,2})
 end
 
 """
-     track_partial(Z::Array{Float64,2}, V::Array{Float64,2}, masks)
+track_partial(Z::AbstractArray{Float64,2}, V::AbstractArray{Float64,2}, masks)
 As `track` but with mask on the outer product of `V` (`Pk`). Useful for assessing contribution of specific sets of neurons,
 or specific interaction between sets of neurons.
 """
-function track_partial(Z::Array{Float64,2},
-        V::Array{Float64,2}, masks)
+function track_partial(Z::AbstractArray{Float64,2}, V::AbstractArray{Float64,2}, masks)
     npatterns = size(V, 2)
     R = zeros(size(Z,1), npatterns, length(masks))
     Z = Z'
@@ -86,17 +85,17 @@ function track_partial(Z::Array{Float64,2},
 end
 
 """
-    marchenko_thresh(n,B)
+marchenko_thresh(n,B)
 Get threshold for eigenvalue distribution using Marchenko-Pasur Law. See wiki: https://en.wikipedia.org/wiki/Marchenko%E2%80%93Pastur_distribution
 """
 marchenko_thresh(n,B) = ((1-sqrt(n/B))^2,(1+sqrt(n/B))^2)
 
 
 """
-    bootstrap(model::PopulationModel, Z, n=100, dim=2)
+bootstrap(model::PopulationModel, Z, n=100, dim=2)
 Fit model `n` times sampling (with replacement) from dimension `dim`.
 """
-function bootstrap{T,N}(model::PopulationModel, Z::Array{T,N}, n=100, dim=2)
+function bootstrap(model::PopulationModel, Z::AbstractArray{T,N}, n=100, dim=2) where {T,N}
     nsamples = size(Z,dim)
     sample_inds = zeros(Int,nsamples)
     f(_) = begin
@@ -109,17 +108,17 @@ function bootstrap{T,N}(model::PopulationModel, Z::Array{T,N}, n=100, dim=2)
 end
 
 """
-    function confint{T<:PopulationModel}(f::Function,
-                                         model::T,
-                                         models::Array{T,1};
-                                         α=0.05)
+function confint{T<:PopulationModel}(f::Function,
+model::T,
+models::AbstractArray{T,1};
+α=0.05)
 Get confidence interval of parameter from sample of `models` where the
 parameter is defined by `f(model)` 
 """
-function confint{T<:PopulationModel}(f::Function,
-                                     model::T,
-                                     models::Array{T,1};
-                                     α=0.05)
+function confint(f::Function,
+                 model::T,
+                 models::AbstractArray{T,1};
+                 α=0.05) where T<:PopulationModel
     params = f.(models)
     reorder!.(params, [f(model)])
     lo = zeros(size(params[1])...)
@@ -133,14 +132,14 @@ function confint{T<:PopulationModel}(f::Function,
     return lo,hi
 end
 
-function confint{T<:PopulationModel}(model::T, models::Array{T,1}; kwargs...)
+function confint(model::T, models::AbstractArray{T,1}; kwargs...) where T<:PopulationModel
     confint(weights, model, models; kwargs...)
 end
 
 stability(f::Function, model, models) = mean(similarity(f, model, models),2 )
 
 """
-	similarity(f::Function=weights, model, models)
+similarity(f::Function=weights, model, models)
 Compare a model to other models using the function `f` (defaults to weights).
 """
 function similarity(f::Function, model, models)
@@ -154,13 +153,13 @@ end
 similarity(model,models) = similarity(weights, model, models)
 
 """
-	get_sig_membs(model::P, btstrp::Array{P,1}, sigf = (lo,hi) -> (lo .> 0);
-		α=0.05)
+get_sig_membs(model::P, btstrp::AbstractArray{P,1}, sigf = (lo,hi) -> (lo .> 0);
+α=0.05)
 Find the members of the model that consistently contribute to the model under
 subsampling (usually bootstrap).
 """
-function get_sig_membs(model::P, btstrp::Array{P,1}, sigf = (lo,hi) -> (lo .> 0);
-        α=0.05) where P<:PopulationModel
+function get_sig_membs(model::P, btstrp::AbstractArray{P,1}, sigf = (lo,hi) -> (lo .> 0);
+                       α=0.05) where P<:PopulationModel
     V = weights(model)
     lo,hi=confint(weights, model, btstrp, α=α)
     sign_membs = falses(size(V,2))
