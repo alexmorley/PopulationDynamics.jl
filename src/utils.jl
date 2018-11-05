@@ -27,18 +27,20 @@ function normweightvectors!(V::AbstractArray{T,2}) where T
 end
 
 """
-function track(Z, V)
+function track(Z, V, M)
 Track zscored firing rates Z using weight vectors V.
 Tracking uses quadratic form:
 R(t) = z(t)' * Pk(t) * (zt)
+where Pk is masked by matrix M.
 """
-function track(Z::AbstractArray{T,2}, V::AbstractArray{T,2}) where T<:Float64
+function track(Z::AbstractArray{T,2}, V::AbstractArray{T,2},
+               M::AbstractArray{Bool,2}) where T<:Float64
     K = size(V,2)
     R = zeros(Float64, size(Z,2), K)
-    Threads.@threads for k in 1:K
+    for k in 1:K
         Rk = view(R,:,k)
         Pk = V[:,k]*V[:,k]'
-        Pk[diagind(Pk)] .= 0.
+        Pk[M] .= 0.
         trackK!(Rk, Pk, Z)
     end
     return R
@@ -54,7 +56,7 @@ end
 function strength(Z::AbstractArray{T,2}, V::AbstractArray{T,2}) where T<:Float64 
     K = size(V,2)
     R = zeros(Float64, K)
-    Threads.@threads for k in 1:K
+    for k in 1:K
         Pk = V[:,k]*V[:,k]'
         Pk[diagind(Pk)] .= 0.
         for t in 1:size(Z,2)
@@ -65,16 +67,16 @@ function strength(Z::AbstractArray{T,2}, V::AbstractArray{T,2}) where T<:Float64
 end
 
 """
-track_partial(Z::AbstractArray{Float64,2}, V::AbstractArray{Float64,2}, masks)
+track_partial(Z::AbstractArray{Float64,2}, V::AbstractArray{Float64,2}, multipliers)
 As `track` but with mask on the outer product of `V` (`Pk`). Useful for assessing contribution of specific sets of neurons,
 or specific interaction between sets of neurons.
 """
-function track_partial(Z::AbstractArray{Float64,2}, V::AbstractArray{Float64,2}, masks)
+function track_partial(Z::AbstractArray{Float64,2}, V::AbstractArray{Float64,2}, multipliers)
     npatterns = size(V, 2)
-    R = zeros(size(Z,1), npatterns, length(masks))
+    R = zeros(size(Z,1), npatterns, length(multipliers))
     Z = Z'
-    Threads.@threads for k in 1:npatterns
-        for (mi,m) in enumerate(masks)
+    for k in 1:npatterns
+        for (mi,m) in enumerate(multipliers)
             Pk = V[:,k]*V[:,k]'
             Pk[diagind(Pk)] .= 0.;
             Pk .*= m

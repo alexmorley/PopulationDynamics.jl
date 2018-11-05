@@ -34,11 +34,20 @@ function track_model(model_t, metadata::Dict, spiketimes::SpikeTimes;
                     binsize::Float64 = 0.02,
                     tracking_resolution::Float64 = 0.001,
                     tracking_kernelwidth::Float64 = sqrt(binsize/tracking_resolution),
-                    tracking_type::Symbol = :full
+                    tracking_type::Symbol = :full,
+                    apply_tetrode_mask = true
                 )
                 
-    cells2use = EPhys.ratefilt(metadata["cellIDs"], spiketimes,ratefilt[1], ratefilt[2]
-                    )[2:end]
+    cells2use = EPhys.ratefilt(metadata["cellIDs"], spiketimes,ratefilt[1],
+                               ratefilt[2])[2:end]
+    if apply_tetrode_mask
+        # we don't want to track cells from the same tetrode together as otherwise
+        # we might be biased by spike sorting errors
+        mask   = [x==y for x in metadata["tetlist"][cells2use],
+                     y in metadata["tetlist"][cells2use]]
+    else
+        mask   = [x==y for x in 1:sum(cells2use), y in 1:sum(cells2use)]
+    end
 
     Z = binZ(spiketimes, binsize)[:,cells2use]'
     Zconv = binZ(spiketimes, tracking_resolution)[:,cells2use]
@@ -48,17 +57,17 @@ function track_model(model_t, metadata::Dict, spiketimes::SpikeTimes;
     PopulationDynamics.fit!(model, Z)
                 
     if tracking_type == :full
-        R_split = [track(Zconv', weights(model))]
+        R_split = [track(Zconv', weights(model), mask)]
     elseif tracking_type == :regional
         idmatch = cat(2,[contains.(metadata["cellIDs"][cells2use],id) for id in regions]...)
-        masks = [BitArray(idmatch[:,i] * idmatch[:,j]') 
+        multipliers = [BitArray(idmatch[:,i] * idmatch[:,j]') 
             for i in indices(idmatch,2) for j in indices(idmatch,2)]
-        R_split = track_partial(Zconv, weights(model), masks)
+        R_split = track_partial(Zconv, weights(model), multipliers)
     elseif tracking_type == :diagvsoff
         idmatch = cat(2,[contains.(metadata["cellIDs"][cells2use],id) for id in regions]...)
-        mask_ = BitArray(idmatch * idmatch')
-        masks = [mask_, .!(mask_)]
-        R_split = track_partial(Zconv, PopulationDynamics.weights(model), masks)
+        multiplier_ = BitArray(idmatch * idmatch')
+        multipliers = [multiplier_, .!(multiplier_)]
+        R_split = track_partial(Zconv, PopulationDynamics.weights(model), multipliers)
     else
         error("""
         No tracking type $tracking_type:
