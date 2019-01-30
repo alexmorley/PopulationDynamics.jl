@@ -10,8 +10,8 @@ if VERSION >= v"0.7.0"
 end
 
 using MultivariateStats, StatsBase
-using RecursiveArrayTools, TensorDecompositions, Munkres
-
+using RecursiveArrayTools, Munkres
+#TensorDecompositions
 
 export fit!, weights
 export track, track_partial, bootstrap, confint
@@ -21,7 +21,7 @@ export factors
 include("types.jl")
 include("utils.jl")
 include("pcaica.jl")
-include("tensor_decompositions.jl")
+#include("tensor_decompositions.jl")
 
 include("ephysIO.jl")
 #include("coactivation.jl")

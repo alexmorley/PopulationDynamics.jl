@@ -33,16 +33,16 @@ function track_model(model_t, metadata::Dict, spiketimes::SpikeTimes;
                     ratefilt::Tuple{Float64,Float64} = (0.05,10.),                   
                     binsize::Float64 = 0.02,
                     tracking_resolution::Float64 = 0.001,
-                    tracking_kernelwidth::Float64 = sqrt(binsize/tracking_resolution),
+                    tracking_kernelwidth::Float64 = sqrt(binsize/
+                                                         tracking_resolution),
                     tracking_type::Symbol = :full,
                     apply_tetrode_mask = true
                 )
-                
     cells2use = EPhys.ratefilt(metadata["cellIDs"], spiketimes,ratefilt[1],
                                ratefilt[2])[2:end]
     if apply_tetrode_mask
-        # we don't want to track cells from the same tetrode together as otherwise
-        # we might be biased by spike sorting errors
+        # we don't want to track cells from the same tetrode together as 
+        # otherwise we might be biased by spike sorting errors
         mask   = [x==y for x in metadata["tetlist"][cells2use],
                      y in metadata["tetlist"][cells2use]]
     else
@@ -59,12 +59,12 @@ function track_model(model_t, metadata::Dict, spiketimes::SpikeTimes;
     if tracking_type == :full
         R_split = [track(Zconv', weights(model), mask)]
     elseif tracking_type == :regional
-        idmatch = cat(2,[contains.(metadata["cellIDs"][cells2use],id) for id in regions]...)
+        idmatch = cat([contains.(metadata["cellIDs"][cells2use]) for id in regions]...,dims=2)
         multipliers = [BitArray(idmatch[:,i] * idmatch[:,j]') 
             for i in indices(idmatch,2) for j in indices(idmatch,2)]
         R_split = track_partial(Zconv, weights(model), multipliers)
     elseif tracking_type == :diagvsoff
-        idmatch = cat(2,[contains.(metadata["cellIDs"][cells2use],id) for id in regions]...)
+        idmatch = cat([occursin.(id,metadata["cellIDs"][cells2use]) for id in regions]..., dims=2)
         multiplier_ = BitArray(idmatch * idmatch')
         multipliers = [multiplier_, .!(multiplier_)]
         R_split = track_partial(Zconv, PopulationDynamics.weights(model), multipliers)
