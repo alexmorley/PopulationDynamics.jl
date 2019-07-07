@@ -1,5 +1,5 @@
 using PopulationDynamics
-using Base.Test
+using Test
 
 SKIP = true
 if !SKIP
