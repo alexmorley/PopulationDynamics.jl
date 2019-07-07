@@ -12,8 +12,9 @@
 - [X] PCAICA
 - [X] PCA
 - [X] Tensor Decompositions (CP)
-- [ ] Cross Correlations
+- [X] Cross Correlations
 
 ## Models Coming Soon
 - [ ] Factor Analysis
+- [ ] Linear Discriminant Analysis
 - [ ] Community Detection
