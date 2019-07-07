@@ -1,6 +1,3 @@
-export PopulationModel
-
-abstract type PopulationModel end
 
 function track(model::PopulationModel, Z::Array{T,2}, M::BitArray{2}) where T
     track(Z, weights(model), M)

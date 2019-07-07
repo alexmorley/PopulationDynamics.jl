@@ -18,9 +18,11 @@ export track, track_partial, bootstrap, confint
 export similarity, stability
 export factors
 
-include("types.jl")
+abstract type PopulationModel end
+
 include("utils.jl")
 include("pcaica.jl")
+include("types.jl")
 #include("tensor_decompositions.jl")
 
 include("ephysIO.jl")
