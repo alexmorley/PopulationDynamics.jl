@@ -224,11 +224,11 @@ version = "0.19.2"
 
 [[EPhys]]
 deps = ["ArgParse", "Combinatorics", "DSP", "DelimitedFiles", "Distributed", "HDF5", "HypothesisTests", "Images", "Interpolations", "KernelDensity", "LinearAlgebra", "MAT", "MATLAB", "Mmap", "MultivariateStats", "NaNMath", "ProgressMeter", "PyCall", "Random", "ScikitLearn", "Statistics", "StatsBase", "utils"]
-git-tree-sha1 = "e0d1a0825d99745424789a03970fb39b5f051f88"
+git-tree-sha1 = "41ac25dccc37d42fb88db882d56ddf8598f21c09"
 repo-rev = "master"
 repo-url = "git@github.com:alexmorley/EPhys.jl.git"
 uuid = "afb3acb3-beff-5307-91d7-0a9df4763f4b"
-version = "0.0.1"
+version = "0.0.2"
 
 [[FFTViews]]
 deps = ["CustomUnitRanges", "FFTW", "Test"]
