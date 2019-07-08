@@ -1,5 +1,5 @@
 # PopulationDynamics
-![TravisCI](https://travis-ci.com/alexmorley/PopulationDynamics.jl.svg?token=J1NxBfxGFhAmxxjYjuHi&branch=master)
+[![Build Status](https://travis-ci.com/alexmorley/PopulationDynamics.jl.svg?branch=master)](https://travis-ci.com/alexmorley/PopulationDynamics.jl)
 
 ## Depends on:
 
