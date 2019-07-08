@@ -4,7 +4,7 @@ author = ["Alexander Morley <alex@alexmorley.me>"]
 version = "0.0.1"
 
 [deps]
-EPhys = "afb3acb3-beff-5307-91d7-0a9df4763f4b"
+EPhysBase = "26bcad50-a183-11e9-160b-45ef884fa5d0"
 Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MultivariateStats = "6f286f6a-111f-5878-ab1e-185364afe411"

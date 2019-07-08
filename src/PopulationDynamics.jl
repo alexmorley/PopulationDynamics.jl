@@ -1,7 +1,7 @@
 module PopulationDynamics
 using Reexport
 using utils
-@reexport using EPhys
+@reexport using EPhysBase
 
 if VERSION >= v"0.7.0"
     using Random
